@@ -10,8 +10,8 @@ class Quadrado(pygame.sprite.Sprite):
         # cria a superficia retangular (surf) para desenhar o quadrado
         self.surf = pygame.Surface((25, 25))
 
-        # preenche surf de azul
-        self.surf.fill((0, 200, 255))
+        # preenche surf de verde
+        self.surf.fill((34, 139, 34))
         
         # cria um retangulo (pygame.Rect) que envolve a superficie
         # importante para manipular a posição do sprite e detectar colisões
