@@ -5,7 +5,7 @@ from pygame.locals import *
 class Matriz:
 
     # matriz servidor
-    def maatriz(): 
+    def gera_maatriz(): 
 
         # quantidade de bombas por partida
         bombas = 5
@@ -30,6 +30,10 @@ class Matriz:
             matriz_r.append(matriz_c)
         
         return matriz_r
+
+
+    def atualiza_matriz(linha, coluna, matriz):
+        pass
 
     #matriz cliente
     def gera_campo_minado(x_ref, y_ref, tela, matriz_binaria, aresta, lotes): 

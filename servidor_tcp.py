@@ -1,3 +1,4 @@
+import re
 import socket
 from matriz import Matriz
 
@@ -5,41 +6,81 @@ MINHA_PORTA = 8000
 
 MEU_IP = '127.0.0.1'
 
-
 tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # Definir o IP e porta para o servidor ouvir
 MEU_SERVIDOR = (MEU_IP, MINHA_PORTA)
 
-tcp.bind(MEU_SERVIDOR)  # Faz o bind do IP e da porta para começar a ouvir
+# Faz o bind do IP e da porta para começar a ouvir
+tcp.bind(MEU_SERVIDOR)  
 
-tcp.listen(1)  # Começar a ouvir (aguardar conexão)
+# Começar a ouvir (aguardar conexão)
+tcp.listen(1)  
 
-# print(f"Servidor ouvindo na porta {MINHA_PORTA}...")
+print(f"Jogo rodando aqui {MEU_IP}:{MINHA_PORTA}...")
 
 # Aceitar conexão do cliente
-conexao, docliente = tcp.accept()
+conexao, add_cliente = tcp.accept()
 
-# print("O cliente =", docliente, "se conectou")
+matriz_de_lotes = Matriz.gera_matriz()
 
-matriz_de_lotes = Matriz.maatriz()
-
-teste = True
+vencedor = False
 
 print("| -----  Lote Premiado começou!   ----- |")
-# Loop para receber mensagens do cliente
-while teste:
+
+# Enquanto não houver um vencedor
+
+total_jogadores = 0
+
+jogadores = []
+
+enderecos = []
+
+jogador_da_vez = 0
+
+while not vencedor:
     
-    Mensagem_Recebida = conexao.recv(1024)
+    nova_mensagem = conexao.recv(1024)
 
-    if Mensagem_Recebida:
+    if total_jogadores < 2 and nova_mensagem:
 
-        mensagem = Mensagem_Recebida.decode('utf8')
+        mensagem = nova_mensagem.decode('utf8')
 
-        if mensagem == 'matriz':
-        # Se houver uma nova mensagem, imprime na tela
-            print("Recebi =", Mensagem_Recebida.decode("utf8"), ", Do cliente", docliente)
-            teste = False
+        if 'Quero jogar' in mensagem:
+
+            total_jogadores += 1
+
+            jogadores.append(conexao)
+
+            enderecos.append(add_cliente)
+
+                
+    # se já tiver achado os 2 jogadores e mensagem foi enviado de um dos 2...
+    elif conexao in jogadores and jogador_da_vez == jogadores.index(conexao):
+
+        regex_msg = re.search(r'linha=(?P<l>.?)\s*coluna=(?P<c>.?)', mensagem)
+
+        linha = regex_msg.group('l')
+
+        coluna = regex_msg.group('c')
+
+        atualizacao, matriz_de_lotes = Matriz.atualiza_matriz(int(linha), int(coluna), matriz_de_lotes)
+
+        if 'explodiu' in atualizacao:
+            pass
+
+    
+    else:
+        pass
+            
+
+
+
+
+
+            
+
+
 
 # Fechar a conexão ao terminar
 conexao.close()

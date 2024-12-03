@@ -15,18 +15,27 @@ DESTINO = (IP_Servidor, PORTA_Servidor)
 try:
     # Conectar ao servidor
     tcp.connect(DESTINO)
+
     print(f"Conectado ao servidor {IP_Servidor}:{PORTA_Servidor}.")
+
     print("Você pode começar a enviar mensagens (digite 'sair' para desconectar).")
 
     # Loop principal para enviar mensagens
     while True:
+
         Mensagem = input("Digite sua mensagem: ")
+
         if Mensagem.lower() == 'sair':
+
             print("Desconectando...")
+
             break
+
         tcp.send(bytes(Mensagem, "utf8"))
+
 except socket.error as e:
     print(f"Erro ao conectar ou enviar dados: {e}")
+    
 finally:
     tcp.close()
     print("Conexão encerrada.")
