@@ -1,60 +1,56 @@
 import pygame
 from pygame.locals import *
+from quadrado import Quadrado
+from matriz import Matriz
 
 
-class Quadrado(pygame.sprite.Sprite):
-
-    def __init__(self):
-        super(Quadrado, self).__init__()
-
-        # cria a superficia retangular (surf) para desenhar o quadrado
-        self.surf = pygame.Surface((25, 25))
-
-        # preenche surf de verde
-        self.surf.fill((34, 139, 34))
-        
-        # cria um retangulo (pygame.Rect) que envolve a superficie
-        # importante para manipular a posição do sprite e detectar colisões
-        self.rect = self.surf.get_rect()
-
+matriz_binaria = Matriz.maatriz()
 
 pygame.init()
 
 # display do jogo
 tela = pygame.display.set_mode((800, 600))
 
-square1 = Quadrado()
-square2 = Quadrado()
-square3 = Quadrado()
-square4 = Quadrado()
+lotes = pygame.sprite.Group()
  
 # variavel que mantem o jogo rodando
 gameOn = True
- 
+
 # loop que mantem o jogo
 while gameOn:
 
+    Matriz.gera_campo_minado(x_ref=40, y_ref=40, tela=tela, matriz_binaria=matriz_binaria, aresta=25, lotes=lotes)
+
     # retorna uma lista de eventos que ocorreram desde o último ciclo do loop
-    for event in pygame.event.get():
-         
+    for evento in pygame.event.get():
+
         # checa se uma tecla foi pressionada
-        if event.type == KEYDOWN:
+        if evento.type == KEYDOWN:
              
             # checa se a tecla foi "backspace"
-            if event.key == K_BACKSPACE:
+            if evento.key == K_BACKSPACE:
                 gameOn = False # sai do loop
+        
+
                  
         # checa se, por exemplo, a janela foi fechada 
-        elif event.type == QUIT:
+        elif evento.type == QUIT:
             gameOn = False
- 
-    # Define onde os quadrados vão aparecer na tela
-    # o blit desenha eles na superficie onde o jogo roda to draw them on the screen surface
-    tela.blit(square1.surf, (40, 40))
-    tela.blit(square2.surf, (40, 530))
-    tela.blit(square3.surf, (730, 40))
-    tela.blit(square4.surf, (730, 530))
- 
-    # atualiza o display com as mudanças feitas
+
+    lotes.draw(tela)
     pygame.display.flip()
 
+pygame.quit()
+
+
+# elif evento.type == pygame.MOUSEBUTTONUP: # se o evento foi o clique do mouse
+
+#     #pego a posicao dele
+#     posicao_mouse = pygame.mouse.get_pos()
+
+#     # verifico em qual quadrado ocorreu o clique
+#     lotes_clicados = [lote for lote in lotes if lote.rect.collidepoint(posicao_mouse)]
+
+#     # teste para pintar de branco o lote clicado
+#     for lote in lotes_clicados:
+#         lote.surf.fill((255, 255, 255))
