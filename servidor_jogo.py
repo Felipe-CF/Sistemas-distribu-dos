@@ -2,9 +2,9 @@ import re
 import socket
 from matriz import Matriz
 
-MINHA_PORTA = 8000
-
 MEU_IP = '127.0.0.1'
+
+MINHA_PORTA = 8000
 
 tcp_receber = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -39,9 +39,7 @@ while total_jogadores < 2:
 
             total_jogadores += 1
 
-            # a resposta será via UDP, por isso não precisamos salvar a conexão
-            # somente o endereço
-
+            # a resposta será via UDP, mas precisamos da conexão para validar a vez do jogador
             jogador = {
                 'conexao': conexao,
                 'endereco': add_cliente
@@ -70,7 +68,7 @@ print("| -----  Lote Premiado começou!   ----- |")
 # Enquanto não houver um vencedor
 while not vencedor:
     
-    udp_envio.sendto("Sua vez! Informe qual lote voce deseja capinar! ".encode('utf-8'), jogador_da_vez['endereco'])
+    udp_envio.sendto("Sua vez! Informe qual lote voce deseja capinar!".encode('utf-8'), jogador_da_vez['endereco'])
 
     resposta_jogador = conexao.recv(1024)
 
@@ -90,7 +88,7 @@ while not vencedor:
         if atualizacao == 'explodiu':
             
             # organizo as mensagens para os respectivos jogadores...
-            if conexao is not jogadores[0]:
+            if conexao is not jogadores[0]['conexao']:
                 fim_de_jogo = ['Voce ganhou :) ', 'Você perdeu :(']
             
             else:
@@ -98,12 +96,12 @@ while not vencedor:
 
             # depois envio uma-a-uma
             for i in range(0, 2):
-                udp_envio.sendto(fim_de_jogo[i].encode('utf-8'), jogadores[i])
+                udp_envio.sendto(fim_de_jogo[i].encode('utf-8'), jogadores[i]['endereco'])
             
             vencedor = True
 
         elif atualizacao == 'escolhido':
-            udp_envio.sendto("Escolha outro lote".encode('utf-8'), conexao)
+            udp_envio.sendto("Escolha outro lote".encode('utf-8'), jogador_da_vez['endereco'])
 
         else:
             matriz_de_lotes[linha][coluna] = 2
@@ -113,6 +111,7 @@ while not vencedor:
             
             else:
                 jogador_da_vez = jogadores[0]
+        
 
 # Fechar a conexão ao terminar
 conexao.close()
