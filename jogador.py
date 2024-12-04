@@ -2,16 +2,14 @@
 import socket
 
 ip_jogo = input("Digite o endereço IP do servidor do jogo: ")
+
 porta_jogo = int(input("Digite a porta do servidor do jogo: "))
 
-# Criar o socket TCP
-tcp_envio = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+tcp_envio = socket.socket(socket.AF_INET, socket.SOCK_STREAM)# Criar o socket TCP
 
-# Definir timeout de 10 segundos
-tcp_envio.settimeout(10)  
+tcp_envio.settimeout(10)   # Definir timeout de 10 segundos
 
-# Destino da conexão (IP + Porta)
-DESTINO = (ip_jogo, porta_jogo)
+DESTINO = (ip_jogo, porta_jogo) # Destino da conexão (IP + Porta)
 
 try:
     # Conectar ao servidor
@@ -19,50 +17,78 @@ try:
 
 except socket.error as e:
     print(f"Erro ao conectar ou enviar dados: {e}")
-    
 
-print(f"Conectado ao servidor do jogo = {IP_Servidor}:{PORTA_Servidor}.")
 
-print("Se quiser jogar digite '1', ou '2' para encerrar.")
+print(f"Conectado ao servidor do jogo = {ip_jogo}:{porta_jogo}.")
+
+
+# crio o servidor UDP que ficará responsavel por receber a matriz para gerar o campo minado
+ip_jogador = input("Digite o seu endereço IP para jogar: ")
+
+porta_jogador = int(input("Digite a sua porta para jogar: "))
+
+udp_receber = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
+
+udp_receber.bind((ip_jogador, porta_jogador))
+
+
+jogo = True
+
+matriz = ""
+
+cadastrado = False
+
 
 # Loop principal para enviar mensagens
-
 while True:
 
-    mensagem = input("Digite sua mensagem: ")
+    # fica ouvindo o servidor do jogo
+    dados, origem = udp_receber.recvfrom(1024) 
 
-    if mensagem == '2':
+    endereco_mensagem = origem[0] # pego o endereço da mensagem
 
-        print("Desconectando...")
+    ip_mensagem = origem[1] # pego a porta
 
-        break
-    
-    if mensagem == '1':
-        tcp_envio.send(bytes(mensagem, "utf8"))
+    if endereco_mensagem == ip_jogo and ip_mensagem == ip_jogo and matriz:
 
-if mensagem == '1':
+        matriz = dados.decode('utf-8')
 
-    # jogo começa
+    if not cadastrado:
 
-    udp_receber = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
-    
-    endereco = '127.0.0.1'
+        if matriz == 'Você é um jogador': # o jogador já foi cadastrado
+            cadastrado = True
 
-    porta = 8001
+            continue # volta a ouvir as mensagme do servidor do jogo
 
-    jogo = True
+        print("Se quiser jogar digite '1', ou '2' para encerrar.")
 
-    sock.bind((endereco, porta))
+        mensagem = input("Digite sua mensagem: ")
 
-    while jogo:
+        if mensagem == '2':
 
-    data, addr = sock.recvfrom(1024) # buffer size is 1024 bytes
+            print("Desconectando...")
 
+            break
+        
+        elif mensagem == '1':
 
+            tcp_envio.send(bytes(mensagem, "utf8"))
 
+            cadastrado = True
+
+        else:
+            continue
+
+    # valida se a mensagem veio do servidor do jogo
+    elif endereco_mensagem == ip_jogo and ip_mensagem == ip_jogo:
+
+        matriz = dados.decode('utf-8')
+
+        if matriz == "Sua vez! Informe qual lote voce deseja capinar!":
+            jogo = False
 
 
 # encerra a conexão
-tcp.close()
+tcp_envio.close()
 
 print("Conexão encerrada.")
