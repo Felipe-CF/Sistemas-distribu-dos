@@ -33,7 +33,23 @@ class Matriz:
 
 
     def atualiza_matriz(linha, coluna, matriz):
-        pass
+        
+        if matriz[linha][coluna] == 2:
+
+            msg = "escolhido"
+        
+        elif matriz[linha][coluna] == 0:
+
+            msg =  "explodiu"
+        
+        else:
+
+            matriz[linha][coluna] = 2
+
+            msg =  "bom"
+        
+        return msg, matriz
+
 
     #matriz cliente
     def gera_campo_minado(x_ref, y_ref, tela, matriz_binaria, aresta, lotes): 
