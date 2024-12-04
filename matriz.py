@@ -5,7 +5,7 @@ from pygame.locals import *
 class Matriz:
 
     # matriz servidor
-    def gera_maatriz(): 
+    def gera_matriz(): 
 
         # quantidade de bombas por partida
         bombas = 5

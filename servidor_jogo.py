@@ -1,5 +1,4 @@
-import re
-import socket
+import re, socket, time
 from matriz import Matriz
 
 MEU_IP = '127.0.0.1'
@@ -24,28 +23,21 @@ print(f"| -----  Esperando os jogadores aqui {MEU_IP}:{MINHA_PORTA}...   ----- |
 # Aceitar conexão do cliente
 conexao, add_cliente = tcp_receber.accept()
 
-total_jogadores = 0
-
-jogadores = []
+jogadores = 0
 
 # servidor TCP espera os jogadores serem achados
-while total_jogadores < 2:
+while jogadores < 1:
 
     nova_mensagem = conexao.recv(1024)
 
     mensagem = nova_mensagem.decode('utf8')
     
-    if '1' in mensagem:
+    if 'quero jogar' in mensagem:
 
-            total_jogadores += 1
-
-            # a resposta será via UDP, mas precisamos da conexão para validar a vez do jogador
             jogador = {
-                'conexao': conexao,
-                'endereco': add_cliente
+                'conexao': conexao, # conexão para validar a vez do jogador
+                'endereco': add_cliente # endereço para a comunicação UDP
             }
-
-            jogadores.append(jogador)
 
             print(f"O jogador {jogador['endereco']} foi cadastrado")
 
@@ -53,7 +45,6 @@ while total_jogadores < 2:
 
     else:
         udp_envio.sendto("inscrição inválida".encode('utf-8'), add_cliente)
-
 
 # cria a matriz do jogo 5x5 (em teste)
 matriz_de_lotes = Matriz.gera_matriz()
@@ -68,6 +59,8 @@ print("| -----  Lote Premiado começou!   ----- |")
 # Enquanto não houver um vencedor
 while not vencedor:
     
+    udp_envio.sendto(matriz_de_lotes.encode('utf-8'), jogador_da_vez['endereco'])
+
     udp_envio.sendto("Sua vez! Informe qual lote voce deseja capinar!".encode('utf-8'), jogador_da_vez['endereco'])
 
     resposta_jogador = conexao.recv(1024)
