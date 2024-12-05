@@ -4,12 +4,12 @@ from quadrado import Quadrado
 from matriz import Matriz
 
 
-matriz_binaria = Matriz.maatriz()
+matriz_binaria = Matriz.gera_matriz()
 
 pygame.init()
 
 # display do jogo
-tela = pygame.display.set_mode((800, 600))
+tela = pygame.display.set_mode((700, 600))
 
 lotes = pygame.sprite.Group()
  
@@ -19,7 +19,7 @@ gameOn = True
 # loop que mantem o jogo
 while gameOn:
 
-    Matriz.gera_campo_minado(x_ref=40, y_ref=40, tela=tela, matriz_binaria=matriz_binaria, aresta=25, lotes=lotes)
+    Matriz.gera_campo_minado(x_ref=50, y_ref=50, tela=tela, matriz_binaria=matriz_binaria, aresta=100, lotes=lotes)
 
     # retorna uma lista de eventos que ocorreram desde o último ciclo do loop
     for evento in pygame.event.get():

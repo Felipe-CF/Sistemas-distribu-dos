@@ -36,19 +36,13 @@ class Matriz:
         
         if matriz[linha][coluna] == 2:
 
-            msg = "escolhido"
+            return "escolhido", matriz
         
         elif matriz[linha][coluna] == 0:
 
-            msg =  "explodiu"
+            return "explodiu", matriz
         
-        else:
-
-            matriz[linha][coluna] = 2
-
-            msg =  "bom"
-        
-        return msg, matriz
+        return None, matriz
 
 
     #matriz cliente
@@ -64,13 +58,12 @@ class Matriz:
 
                 novo_lote = Quadrado(aresta)
 
-                if matriz_linha[j] == 0:
+                if matriz_linha[j] != 2:
 
-                    novo_lote.altera_cor(r=34, g=139, b=34)
+                    novo_lote.altera_cor(r=200, g=200, b=200)
                 
                 else:
-
-                    novo_lote.altera_cor(r=139, g=69, b=19)
+                    novo_lote.altera_cor(r=50, g=50, b=50)
 
                 # Define onde os quadrados vão aparecer na tela
                 # o blit desenha eles na superficie onde o jogo roda to draw them on the screen surface

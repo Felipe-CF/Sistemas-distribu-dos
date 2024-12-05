@@ -1,33 +1,32 @@
-#!/usr/bin/python3
-import socket
+import socket, pygame, time
+from pygame.locals import *
+from matriz import Matriz
 
 ip_jogo = input("Digite o endereço IP do servidor do jogo: ")
-
 porta_jogo = int(input("Digite a porta do servidor do jogo: "))
 
-tcp_envio = socket.socket(socket.AF_INET, socket.SOCK_STREAM)# Criar o socket TCP
+# Criar o socket TCP
+tcp_envio = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+tcp_envio.settimeout(10)  # Definir timeout de 10 segundos
 
-tcp_envio.settimeout(10)   # Definir timeout de 10 segundos
+# Criar o socket UDP
+udp_receber = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+udp_receber.bind(('127.0.0.1', 8001))
 
-DESTINO = (ip_jogo, porta_jogo) # Destino da conexão (IP + Porta)
-
+# Conectar ao servidor TCP
 try:
-    # Conectar ao servidor
+    DESTINO = (ip_jogo, porta_jogo)
     tcp_envio.connect(DESTINO)
-
+    print(f"Conectado ao servidor {ip_jogo}:{porta_jogo}.")
 except socket.error as e:
-    print(f"Erro ao conectar ou enviar dados: {e}")
+    print(f"Erro ao conectar ao servidor: {e}")
+    exit()
+
 
 
 print(f"Conectado ao servidor do jogo = {ip_jogo}:{porta_jogo}.")
 
-
 # crio o servidor UDP que ficará responsavel por receber a matriz para gerar o campo minado
-ip_jogador = input("Digite o seu endereço IP para jogar: ")
-
-porta_jogador = int(input("Digite a sua porta para jogar: "))
-
-udp_receber = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
 
 udp_receber.bind((ip_jogador, porta_jogador))
 
@@ -36,8 +35,7 @@ jogo = True
 
 matriz = ""
 
-cadastrado = False
-
+jogando = False
 
 # Loop principal para enviar mensagens
 while True:
@@ -53,40 +51,66 @@ while True:
 
         matriz = dados.decode('utf-8')
 
-    if not cadastrado:
+        # se o jogo ainda não começou
+        if not jogando:
 
-        if matriz == 'Você é um jogador': # o jogador já foi cadastrado
-            cadastrado = True
+            print("Se quiser jogar digite '1', ou '2' para encerrar.")
 
-            continue # volta a ouvir as mensagme do servidor do jogo
+            mensagem = input("Digite sua mensagem: ")
 
-        print("Se quiser jogar digite '1', ou '2' para encerrar.")
+            if mensagem == '2':
 
-        mensagem = input("Digite sua mensagem: ")
+                print("Desconectando...")
 
-        if mensagem == '2':
+                break
+            
+            elif mensagem == '1':
 
-            print("Desconectando...")
+                tcp_envio.send(bytes(mensagem, "utf8"))
 
-            break
-        
-        elif mensagem == '1':
+                jogando = True
 
-            tcp_envio.send(bytes(mensagem, "utf8"))
-
-            cadastrado = True
-
+        # se o jogo já começou
         else:
-            continue
 
-    # valida se a mensagem veio do servidor do jogo
-    elif endereco_mensagem == ip_jogo and ip_mensagem == ip_jogo:
+            if matriz == "Escolha outro Lote" or "pontuação" in matriz:
+                pygame.init()
 
-        matriz = dados.decode('utf-8')
+                # display do jogo
+                tela = pygame.display.set_mode((800, 800))
 
-        if matriz == "Sua vez! Informe qual lote voce deseja capinar!":
-            jogo = False
+                lotes = pygame.sprite.Group()
+                
+                # variavel que mantem o jogo rodando
+                gameOn = True
 
+                # loop que mantem o jogo
+                while gameOn:
+
+                    Matriz.gera_campo_minado(x_ref=50, y_ref=50, tela=tela, matriz_binaria=matriz, aresta=100, lotes=lotes)
+
+                    print("Escolha as posições do lote ")
+                    linha = input("linha: ")
+                    coluna = input("coluna: ")
+                    print("Jogada enviada")
+
+                    # # checa se, por exemplo, a janela foi fechada 
+                    # if pygame.event.get().type == QUIT:
+                    gameOn = False
+
+                    lotes.draw(tela)
+
+                    pygame.display.flip()
+
+                    pygame.quit()
+
+            else:
+                print(matriz)
+
+                break
+            
+
+print("O jogo acabou.")
 
 # encerra a conexão
 tcp_envio.close()
