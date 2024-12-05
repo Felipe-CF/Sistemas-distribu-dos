@@ -12,6 +12,10 @@ pygame.init()
 tela = pygame.display.set_mode((800, 600))
 
 lotes = pygame.sprite.Group()
+
+fundo = pygame.image.load("campo.png")
+
+tela.blit(fundo, (0, 0))
  
 # variavel que mantem o jogo rodando
 gameOn = True
