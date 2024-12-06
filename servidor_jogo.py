@@ -1,4 +1,4 @@
-import re, socket, time
+import re, socket, time, json
 from matriz import Matriz
 
 MEU_IP = '127.0.0.1'
@@ -28,7 +28,7 @@ while True:
 
     nova_mensagem = conexao.recv(1024)
 
-    if nova_mensagem == 'jogo':
+    if nova_mensagem.decode('utf-8') == 'jogo':
 
         print(f"O jogador {add_cliente} foi encontrado")
 
@@ -41,8 +41,8 @@ while True:
 
         break
 
-    # else:
-    #     udp_envio.sendto("inscrição inválida".encode('utf-8'), add_cliente)
+    else:
+        udp_envio.sendto("inscrição inválida".encode('utf-8'), add_cliente)
 
 # cria a matriz do jogo 5x5 (em teste)
 matriz_de_lotes = Matriz.gera_matriz()
@@ -55,8 +55,10 @@ print("| -----  Lote Premiado começou!   ----- |")
 
 # servidor TCP que mantém o jogo rodando
 while not fim_de_jogo:
-    
-    udp_envio.sendto(matriz_de_lotes.encode('utf-8'), jogador['endereco'])
+
+    matriz_serial = json.dumps(matriz_de_lotes)
+
+    udp_envio.sendto(matriz_serial.encode('utf-8'), jogador['endereco'])
 
     udp_envio.sendto("Informe qual lote voce deseja capinar!".encode('utf-8'), jogador['endereco'])
 

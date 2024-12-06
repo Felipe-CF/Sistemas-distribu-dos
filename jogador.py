@@ -1,4 +1,4 @@
-import socket, pygame, time
+import socket, pygame, time, json
 from pygame.locals import *
 from matriz import Matriz
 
@@ -47,7 +47,7 @@ while True:
 
     if jogando and endereco_mensagem == ip_jogo and ip_mensagem == ip_jogo and matriz:
 
-        matriz = dados.decode('utf-8')
+        matriz = json.loads(dados.decode('utf-8'))
 
         if ("Escolha outro Lote" or "pontuação") in matriz:
             pygame.init()
