@@ -23,15 +23,14 @@ print(f"| -----  Esperando os jogadores aqui {MEU_IP}:{MINHA_PORTA}...   ----- |
 # Aceitar conexão do cliente
 conexao, add_cliente = tcp_receber.accept()
 
+print(add_cliente)
 
 # servidor TCP espera os jogadores serem achados
 while True:
 
     nova_mensagem = conexao.recv(1024)
 
-    mensagem = nova_mensagem.decode('utf8')
-    
-    if 'quero jogar' in mensagem:
+    if nova_mensagem == 'jogo':
 
         print(f"O jogador {add_cliente} foi encontrado")
 
@@ -40,12 +39,12 @@ while True:
             'endereco': add_cliente # endereço para a comunicação UDP
         }
         
-        udp_envio.sendto("Você é um jogador".encode('utf-8'), jogador['endereco'])
+        print(jogador['endereco'])
 
         break
 
-    else:
-        udp_envio.sendto("inscrição inválida".encode('utf-8'), add_cliente)
+    # else:
+    #     udp_envio.sendto("inscrição inválida".encode('utf-8'), add_cliente)
 
 # cria a matriz do jogo 5x5 (em teste)
 matriz_de_lotes = Matriz.gera_matriz()
@@ -69,7 +68,7 @@ while not fim_de_jogo:
 
         mensagem = resposta_jogador.decode('utf-8')
 
-        regex_msg = re.search(r'linha=(?P<l>.?)\s*coluna=(?P<c>.*)', mensagem)
+        regex_msg = re.search(r'linha=(?P<l>.?)\s*e\s*coluna=(?P<c>.*)', mensagem)
 
         linha = int(regex_msg.group('l'))
 
@@ -82,7 +81,6 @@ while not fim_de_jogo:
             udp_envio.sendto("Você explodiu!".encode('utf-8'), jogador['endereco'])
 
             fim_de_jogo = True
-
 
         elif atualizacao == 'escolhido':
             udp_envio.sendto("Escolha outro lote".encode('utf-8'), jogador['endereco'])
