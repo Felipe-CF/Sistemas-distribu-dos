@@ -31,8 +31,6 @@ while gameOn:
             if evento.key == K_BACKSPACE:
                 gameOn = False # sai do loop
         
-
-                 
         # checa se, por exemplo, a janela foi fechada 
         elif evento.type == QUIT:
             gameOn = False

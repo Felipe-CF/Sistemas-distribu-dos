@@ -23,8 +23,6 @@ print(f"| -----  Esperando os jogadores aqui {MEU_IP}:{MINHA_PORTA}...   ----- |
 # Aceitar conexão do cliente
 conexao, add_cliente = tcp_receber.accept()
 
-print(add_cliente)
-
 # servidor TCP espera os jogadores serem achados
 while True:
 
