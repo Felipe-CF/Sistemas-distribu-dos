@@ -53,6 +53,8 @@ pontos = 0
 
 print("| -----  Lote Premiado começou!   ----- |")
 
+time.sleep(10)
+
 # servidor TCP que mantém o jogo rodando
 while not fim_de_jogo:
 
