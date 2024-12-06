@@ -1,7 +1,8 @@
 import re, socket, time, json
 from matriz import Matriz
 
-MEU_IP = '127.0.0.1'
+# MEU_IP = '127.0.0.1'
+MEU_IP = '25.49.249.117'
 
 MINHA_PORTA = 8000
 
@@ -53,18 +54,29 @@ pontos = 0
 
 print("| -----  Lote Premiado começou!   ----- |")
 
-time.sleep(10)
+time.sleep(5)
+
+udp_envio.sendto("Informe qual lote voce deseja capinar!".encode('utf-8'), jogador['endereco'])
 
 # servidor TCP que mantém o jogo rodando
 while not fim_de_jogo:
+    print("rodando")
 
     matriz_serial = json.dumps(matriz_de_lotes)
 
+    time.sleep(2)
+
+    print("envio1")
+
     udp_envio.sendto(matriz_serial.encode('utf-8'), jogador['endereco'])
 
+    print("envio2")
+    
     udp_envio.sendto("Informe qual lote voce deseja capinar!".encode('utf-8'), jogador['endereco'])
 
     resposta_jogador = conexao.recv(1024)
+
+    x = input()
 
     if resposta_jogador and conexao == jogador['conexao']:
 

@@ -14,6 +14,8 @@ udp_receber = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # Criar o socket 
 
 udp_receber.bind(('127.0.0.1', 8001)) 
 
+udp_receber.settimeout(10)
+
 # Conectar ao servidor TCP
 try:
     DESTINO = (ip_jogo, porta_jogo)
@@ -45,7 +47,7 @@ while True:
 
     ip_mensagem = origem[1] # pego a porta
 
-    if jogando and endereco_mensagem == ip_jogo and ip_mensagem == ip_jogo and matriz:
+    if (endereco_mensagem == ip_jogo and ip_mensagem == ip_jogo) and dados.decode('utf-8'):
 
         matriz = json.loads(dados.decode('utf-8'))
 
