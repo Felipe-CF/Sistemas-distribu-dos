@@ -2,56 +2,82 @@ import socket, pygame, time, json
 from pygame.locals import *
 from matriz import Matriz
 
-ip_jogo = input("Digite o endereço IP do servidor do jogo: ")
+PORTA_JOGO = 8001
 
-porta_jogo = int(input("Digite a porta do servidor do jogo: "))
+ip_servidor = input("Digite o endereço IP do servidor do jogo: ")
 
-tcp_envio = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # Criar o socket TCP
+porta_servidor = int(input("Digite a porta do servidor do jogo: "))
 
-tcp_envio.settimeout(10)  # Definir timeout de 10 segundos
+tcp_conexao = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # Criar o socket TCP
 
-udp_receber = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # Criar o socket UDP
+tcp_conexao.settimeout(10)  # Definir timeout de 10 segundos
 
-udp_receber.bind(('127.0.0.1', 8001)) 
 
-udp_receber.settimeout(10)
 
 # Conectar ao servidor TCP
-try:
-    DESTINO = (ip_jogo, porta_jogo)
+try: 
+    DESTINO = (ip_servidor, porta_servidor)
 
-    tcp_envio.connect(DESTINO)
+    tcp_conexao.connect(DESTINO)
 
-    tcp_envio.sendall("jogo".encode('utf-8'))
+    tcp_conexao.sendall("jogo".encode('utf-8'))
 
-    print(f"Conectado ao servidor {ip_jogo}:{porta_jogo}.")
+    print(f"Conectado ao servidor {ip_servidor}:{porta_servidor}.")
 
+    print(f"Esperando a porta para receber a matriz.")
+
+    while True:
+
+        dados_servidor = tcp_conexao.recv(1024)  # fica ouvindo o servidor do jogo
+
+        origem = tcp_conexao.getpeername() # pega o IP e a porta de origem da mensagem
+
+        ip_mensagem = origem[0] # pego a porta
+
+        endereco_mensagem = origem[1] # pego o endereço da mensagem
+
+        if (ip_mensagem == ip_servidor and endereco_mensagem == porta_servidor):
+
+            PORTA_JOGO = int(dados_servidor.decode('utf-8')) # pego a porta enviada pelo servidor
+            
+            break
+    
 except socket.error as e:
 
     print(f"Erro ao conectar ao servidor: {e}")
 
     exit()
 
-jogo = True
+print(f"porta recebida.")
+
+udp_conexao = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # Criar o socket UDP
+
+udp_conexao.bind(('127.0.0.1', PORTA_JOGO)) 
+
+udp_conexao.settimeout(10)
 
 matriz = ""
 
-jogando = False
+time.sleep(2)
 
-# Loop principal para enviar mensagens
-while True:
+tcp_conexao.sendall("continue".encode('utf-8'))
 
-    dados, origem = udp_receber.recvfrom(1024)  # fica ouvindo o servidor do jogo
+while True: # Loop principal para enviar mensagens
+
+    dados_servidor, origem = udp_conexao.recvfrom(1024)  # fica ouvindo o servidor do jogo
 
     endereco_mensagem = origem[0] # pego o endereço da mensagem
 
-    ip_mensagem = origem[1] # pego a porta
+    ip_mensagem = origem[1] # pego a porta 
 
-    if (endereco_mensagem == ip_jogo and ip_mensagem == ip_jogo) and dados.decode('utf-8'):
+    if ip_mensagem == ip_servidor and endereco_mensagem == porta_servidor:
+    
+        matriz = json.loads(dados_servidor.decode('utf-8'))
+        
+        print(matriz['mensagem'])
 
-        matriz = json.loads(dados.decode('utf-8'))
+        if ("escolha o lote" or "pontuação" or "escolha outro lote") in matriz['mensagem']:
 
-        if ("Escolha outro Lote" or "pontuação") in matriz:
             pygame.init()
             
             tela = pygame.display.set_mode((800, 800)) # display do jogo
@@ -69,7 +95,7 @@ while True:
 
             coluna = input("Escolha a coluna do lote:: ")
 
-            tcp_envio.send(bytes(f"linha {linha} e coluna {coluna}", "utf-8"))
+            tcp_conexao.send(bytes(f"linha {linha} e coluna {coluna}", "utf-8"))
 
             print("Jogada enviada")
 
@@ -79,7 +105,8 @@ while True:
 
             pygame.quit()
 
-        elif 'Parabéns' in matriz:
+        elif 'parabéns' in matriz:
+
             print("Você ganhou.")
 
             break
@@ -94,6 +121,6 @@ while True:
 print("O jogo acabou.")
 
 # encerra a conexão
-tcp_envio.close()
+tcp_conexao.close()
 
 # print("Conexão encerrada.")
