@@ -1,10 +1,11 @@
 import socket, time
 
 
-MEU_IP = '127.0.0.1'
+# MEU_IP = '127.0.0.1'
 PORTA1 = 8000
 PORTA2 = 8002
 
+MEU_IP = input('digite seu IP: ')
 
 tcp1 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -20,18 +21,18 @@ tcp1.bind(DESTINO1)
 
 tcp2.bind(DESTINO2)  
 
-tcp1.listen(1)   # Começar a ouvir (aguardar conexão)'
+tcp1.listen(1)   
 
-tcp2.listen(1)   # Começar a ouvir (aguardar conexão)
+tcp2.listen(1)   
 
 try:
     print('esperando conexao1')
-    conexao1, add_chat1 = tcp1.accept() # Aceitar conexão do chat1
+    conexao1, add_chat1 = tcp1.accept() 
 
     conexao1.sendall(str(add_chat1[1]+1).encode('utf-8'))
 
     print('esperando conexao2')
-    conexao2, add_chat2 = tcp2.accept() # Aceitar conexão do chat2
+    conexao2, add_chat2 = tcp2.accept() 
 
     conexao2.sendall(str(add_chat2[1]+2).encode('utf-8'))
 
@@ -57,8 +58,6 @@ try:
             print('conexão 2 encerrada')
             break
 
-
-
 except socket.error as e:
 
     print(f"Erro ao conectar ao servidor: {e}")
@@ -71,4 +70,4 @@ finally:
     conexao1.close()
 
     conexao2.close()
-    # Fechar a conexão ao terminar
+

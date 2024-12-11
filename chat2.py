@@ -1,7 +1,9 @@
 import socket, time
 
-MEU_IP = '127.0.0.1'
+# MEU_IP = '127.0.0.1'
 PORTA = 8002
+
+MEU_IP = input('digite o IP do servidor: ')
 
 # Criar o socket TCP
 conexao = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
