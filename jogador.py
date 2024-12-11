@@ -12,8 +12,6 @@ tcp_conexao = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # Criar o socket
 
 tcp_conexao.settimeout(10)  # Definir timeout de 10 segundos
 
-
-
 # Conectar ao servidor TCP
 try: 
     DESTINO = (ip_servidor, porta_servidor)

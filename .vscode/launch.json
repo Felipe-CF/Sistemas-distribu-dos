@@ -5,13 +5,13 @@
             "name": "Servidor",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/servidor_jogo.py"
+            "program": "${workspaceFolder}/servidor_chat.py"
         },
         {
             "name": "Jogador",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/jogador.py"
+            "program": "${workspaceFolder}/chat2.py"
         }
     ],
     "compounds": [
